@@ -1,0 +1,11 @@
+__pycache__
+*.png
+*.jpeg
+*.jpg
+*.xcf
+*.json
+geckodriver.log
+eng.txt
+out.txt
+
+
