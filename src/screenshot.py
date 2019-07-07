@@ -1,7 +1,35 @@
 import win32gui
 from PIL import ImageGrab
 import math
+import sys
 
+def getTopWindowList():
+    root = win32gui.GetDesktopWindow()
+
+    children = []
+    def callback(hwnd, extra):
+        try:
+            if win32gui.IsWindowVisible(hwnd) and win32gui.IsWindowEnabled(hwnd):
+                children.append(
+                    [win32gui.GetWindowText(hwnd), win32gui.GetClassName(hwnd)] )
+        except:
+            print(sys.exc_info()[0])
+        return True
+
+    try:
+        win32gui.EnumWindows( callback, 0 )
+    except:
+        print(sys.exc_info()[0])
+    return children
+
+
+def getImageWith( param ):
+    if param.valid_message_fix_region:
+        return getImageOf(param.game_window_title, param.game_window_class,
+                          param.message_fix_region)
+    else:
+        return getImageOf(param.game_window_title, param.game_window_class, None )
+    
 
 def getImageOf(window_title, window_class, region):
     rect = getRectOf(window_title, window_class)
@@ -36,5 +64,4 @@ def getRectOf(window_title, window_class):
 
 
 if __name__ == '__main__':
-    image = getImageOf("電卓", "")
-    image.show()
+    getTopWindowList()

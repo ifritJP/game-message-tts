@@ -193,7 +193,6 @@ def createPreparedOCRImage(image, parameter, debugFlag):
 
         # opencv の画像フォーマットを PIL に変換
         image_pil = Image.fromarray(ocrImage).convert('RGB')
-
     else:
         imgray = cv2.cvtColor(im, cv2.COLOR_RGB2GRAY)
         # im = cv2.imread( targetImagePath )
@@ -221,7 +220,6 @@ def createPreparedOCRImage(image, parameter, debugFlag):
         # show(edge_img)
         region = detectLine(edge_img, im.copy(), parameter, debugFlag)
 
-        image_pil = None
         if region != None:
             # 領域を検出できた場合
             box_img = im[region[1]:region[3], region[0]:region[2]]
@@ -231,6 +229,13 @@ def createPreparedOCRImage(image, parameter, debugFlag):
 
             # opencv の画像フォーマットを PIL に変換
             image_pil = Image.fromarray(ocrImage).convert('RGB')
+        else:
+            ocrImage = pickChar(im, parameter)
+            show(ocrImage, debugFlag)
+
+            # opencv の画像フォーマットを PIL に変換
+            image_pil = Image.fromarray(ocrImage).convert('RGB')
+
 
     cv2.destroyAllWindows()
 

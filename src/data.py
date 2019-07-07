@@ -60,20 +60,7 @@ class Parameter:
     # テスト用のデフォルトインスタンス生成関数を staticmethod で作成する
     @staticmethod
     def create_default():
-        return Parameter(MIN_HEIGHT=50,
-                         MIN_WIDTH=300,
-                         top_margin=10,
-                         bottom_margin=10,
-                         OFFSET=[0, 0, 0, 0],
-                         message_fix_region=[0, 0, 0, 0],
-                         valid_message_fix_region=False,
-                         message_thresh=0,
-                         exclude_txt="",
-                         game_title="game title",
-                         game_window_title="game window title",
-                         game_window_class="game window class",
-                         volume=100,
-                         speed=0)
+        return Parameter()
 
     @staticmethod
     def loadFile(path):

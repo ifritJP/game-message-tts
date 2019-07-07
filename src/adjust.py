@@ -2,6 +2,7 @@
 
 import sys
 import tkinter
+from tkinter import ttk
 import prepare_ocr
 import ocr
 from PIL import Image
@@ -28,6 +29,14 @@ def show(root, param):
 
     sub.protocol("WM_DELETE_WINDOW", on_closing)
 
+    def showPopup(event):
+        menu = tkinter.Menu(sub, tearoff=False)
+        menu.add_command(label='Cut', underline=5,
+                         command=lambda: event.widget.event_generate("<<Cut>>"))
+        menu.post(event.x_root, event.y_root)
+
+    sub.bind_class("Entry", "<Button-3><ButtonRelease-3>", showPopup)
+
     frame1 = tkinter.Frame(sub)
     frame1.pack(fill="both", expand=True)
 
@@ -44,6 +53,43 @@ def show(root, param):
     classBox = tkinter.Entry(classFrame)
     classBox.insert(tkinter.END, param.game_window_class)
     classBox.pack(fill="both", expand=True)
+
+    # window リスト
+    windowList = screenshot.getTopWindowList()
+    titleList = [param.game_window_title]
+    classList = [param.game_window_class]
+    comboList = ["%s:%s" % (titleList[0], classList[0])]
+    for window in windowList:
+        title = window[0]
+        classTxt = window[1]
+        titleList.append(title)
+        classList.append(classTxt)
+        comboList.append("%s:%s" % (title, classTxt))
+
+    def createCombbox(parent, title, valList, onSelected):
+        frame = tkinter.LabelFrame(parent, bd=2, relief="ridge", text=title)
+        frame.pack(fill="both", side="left", expand=True)
+        val = tkinter.StringVar()
+        combo = ttk.Combobox(frame, textvariable=val)
+        combo.config(values=valList)
+        combo.set(valList[0])
+        combo.bind("<<ComboboxSelected>>", onSelected)
+        combo.pack(fill="both", expand=True)
+        return combo
+
+    def onSelectedCombobox(event):
+        titleBox.delete(0, tkinter.END)
+        titleBox.insert(tkinter.END, titleList[windowCombo.current()])
+        classBox.delete(0, tkinter.END)
+        classBox.insert(tkinter.END, classList[windowCombo.current()])
+
+    windowListFrame = tkinter.LabelFrame(sub, bd=2, relief="ridge", text="window list")
+    windowListFrame.pack(fill="both", expand=True)
+
+    # title
+    windowCombo = createCombbox(windowListFrame, "title", comboList, onSelectedCombobox)
+    # # class
+    # classVal = createCombbox(windowListFrame, "class", classList)
 
     # 領域決定
     frame2 = tkinter.Frame(sub)
@@ -94,19 +140,7 @@ def show(root, param):
     def pushedOcrButton(event):
         apply_param()
 
-        if validRegion.get() == "1":
-            # region = [param.message_fix_region[0],
-            #           param.message_fix_region[1],
-            #           param.message_fix_region[2] - param.message_fix_region[0],
-            #           param.message_fix_region[3] - param.message_fix_region[1]]
-            #game_image = pyautogui.screenshot(region=region)
-            game_image = screenshot.getImageOf(param.game_window_title,
-                                               param.game_window_class,
-                                               param.message_fix_region)
-        else:
-            # game_image = Image.open('test2.png')
-            game_image = screenshot.getImageOf(param.game_window_title,
-                                               param.game_window_class, None )
+        game_image = screenshot.getImageWith(param)
         ocr_image = prepare_ocr.createPreparedOCRImage(game_image, param, True)
         txt = ocr.getTxt(ocr_image).replace('\n', ' ')
         textArea.delete('1.0', 'end -1c')
