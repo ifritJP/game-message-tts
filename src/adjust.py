@@ -8,6 +8,7 @@ import ocr
 from PIL import Image
 import data
 import decideRegion
+import uihelper
 
 #import pyautogui
 import screenshot
@@ -29,13 +30,14 @@ def show(root, param):
 
     sub.protocol("WM_DELETE_WINDOW", on_closing)
 
-    def showPopup(event):
-        menu = tkinter.Menu(sub, tearoff=False)
-        menu.add_command(label='Cut', underline=5,
-                         command=lambda: event.widget.event_generate("<<Cut>>"))
-        menu.post(event.x_root, event.y_root)
+    uihelper.registerEntryPopupMenu(sub)
+    # def showPopup(event):
+    #     menu = tkinter.Menu(sub, tearoff=False)
+    #     menu.add_command(label='Cut', underline=5,
+    #                      command=lambda: event.widget.event_generate("<<Cut>>"))
+    #     menu.post(event.x_root, event.y_root)
 
-    sub.bind_class("Entry", "<Button-3><ButtonRelease-3>", showPopup)
+    # sub.bind_class("Entry", "<Button-3><ButtonRelease-3>", showPopup)
 
     frame1 = tkinter.Frame(sub)
     frame1.pack(fill="both", expand=True)

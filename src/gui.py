@@ -12,10 +12,13 @@ import threading
 import re
 import webbrowser
 import urllib.parse
+import uihelper
 
 
 def show(param, history):
     root = tkinter.Tk()
+
+    uihelper.registerEntryPopupMenu(root)
 
     def apply_param():
         param.game_title = titleVal.get()
