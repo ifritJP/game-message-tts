@@ -22,7 +22,7 @@
 
 その他、詳しい事情はこっち。
 
-<https://ifritjp.github.io/blog/site/index.html>
+<https://ifritjp.github.io/blog/site/2019/06/28/text-to-speech.html>
 
 * 機能
 
