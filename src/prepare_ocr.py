@@ -162,8 +162,13 @@ def pickChar(image, parameter):
     # ret, thresh = cv2.threshold(image, 200, 255, cv2.THRESH_BINARY )
     #show(thresh, True )
 
-    # OCR は 白背景 で黒文字で判定する
-    return cv2.bitwise_not(thresh)
+    # OCR は 白背景 で黒文字で判定する。
+    # 黒と、白どちらが多いかヒストグラムで判定し、
+    # 黒の方が多い場合はネガポジ反転する。
+    hist = cv2.calcHist([thresh],[0],None,[256],[0,256])
+    if sum( hist[:128] ) > sum(hist[128:] ):
+        return cv2.bitwise_not(thresh)
+    return thresh
 
 
 def ColorDodge(bg_img, fg_img):

@@ -12,13 +12,17 @@
 
 何故こんなツールを作ったかというと、
 英語学習用に海外のゲームをプレイしているんですが、
-そのゲームに音声が付いておらずリスニング力向上に使えないため、
+その海外のゲームに音声が付いておらずリスニング力向上に使えないため、
 どうにかして音声を付けようと思ったのが動機です。
 
 また、Windows の標準機能で、Window 内のラベル等を読み上げる機能がありますが、
 あれは Windows の標準 GUI 部品を対象にしていて、
 標準 GUI 部品ではないゲーム画面のメッセージなどは非対応になっているため、
 ゲーム画面のメッセージの読み上げには使えなかった事も、理由の一つです。
+
+その他、詳しい事情はこっち。
+
+<https://ifritjp.github.io/blog/site/index.html>
 
 * 機能
 
@@ -42,23 +46,68 @@
 
 次のソフトのインストールが必要です。
 
-- Tesseract OCR
-  - PATH の設定
 - Python
   - 幾つかの Python 用パッケージ
+  - win32com
+- Tesseract OCR
+  - PATH の設定
 - このツール    
 
-Windows と Python の知識が多少あることが前提です。
+インストールには、Windows と Python の知識が多少あることが前提です。
+
+*** Python
+
+次の URL から Python をダウンロードします。
+    
+<https://www.python.org/downloads/>
+
+なお、 Cygwin 版の python だと、
+後のインストール処理が正常に動作しなかったためオススメしません。
+
+Python をインストール後、次の python のモジュールをインストールします。
+
+#+BEGIN_SRC txt
+$ python -m pip install pywin32
+$ python -m pip install Pillow
+$ python -m pip install pyscreenshot
+$ python -m pip install opencv-python
+$ python -m pip install pyocr
+$ python -m pip install marshmallow_dataclass
+#+END_SRC
+
+**** win32com
+
+Windows の TTS を制御するため win32com をインストールします。
+
+<https://github.com/mhammond/pywin32/releases> から、 
+python のバージョンに合う win32com モジュールのインストーラをダウンロードし、
+インストールしてください。
+
+
+*** Tesseract OCR
+
+次の URL からバイナリをダウンロードしてインストールします。
+    
+<https://github.com/UB-Mannheim/tesseract/wiki>
+
+インストール後、 *環境変数の PATH に追加すること* を忘れないでください。
+
+
+*** このツール
+
+次のコマンドで、このツールを落してください。
+    
+: git clone https://github.com/ifritJP/game-message-tts.git
 
 ** 起動方法
 
-run.pyw をダブルクリックします。   
+このツールの run.pyw をダブルクリックします。   
 
 起動すると、コンボボックスとボタンを持つウィンドウが表示されます。
 
 ここでは OK を押します。
 
-次にいくつかのボタンを持つウィンドウが表示されます。
+次に、いくつかのボタンを持つウィンドウが表示されます。
 ここでは、まず game tile の箇所にゲームタイトルを入力します。
 デフォルトでは *notepad* と入力されているので、
 ここをクリアしてタイトルを入力してください。
@@ -100,7 +149,6 @@ window list の combobox の中から、ゲームの Window を選択するだ�
 
 しかし、一部のゲームではタイトル名が随時更新されるものがあります。
 そのような場合、 window title は空にし、 window class だけ指定してください。
-
 window title が空の場合、
 タイトル名は無視して window class だけでゲームの window を検索します。
 
@@ -123,6 +171,8 @@ window title が空の場合、
 次に、領域を指定するためにゲーム window を前面に表示します。
 
 この時、他の window とゲーム画面が被らないように window を移動してください。
+なお、ゲームは FullScreen ではなく、 window 表示にしてください。
+また、マルチディスプレイのセカンダリーでは正常に動作しないことがあるようです。
 
 次に、 「set region」ボタンを押します。
 すると、ゲーム画面の上に半透明の window が表示されるので、
@@ -131,8 +181,8 @@ window title が空の場合、
 指定が終わると、半透明の window が消えます。
   
 なお、「自動で領域を認識する」方法は実験中の機能です。
+使用しないでください。
 
-原則として、使用しないでください。
 
 *** メッセージ抽出用の閾値
 
