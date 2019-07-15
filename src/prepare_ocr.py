@@ -154,6 +154,36 @@ def detectLine(image, disp_img, parameter, debugFlag):
             max(pairLine[0][3], pairLine[1][3]) + parameter.OFFSET[3])
 
 
+# メッセージ領域からメッセージ部分を取り出す
+def excludeBackground( image ):
+    height = image.shape[0]
+    width = image.shape[1]
+    offset = 0
+    band_height = 20
+
+    # 一定の高さバンドに区切って、そのバンドのヒストグラムを取得する。
+    hist_list = []
+    while offset + band_height <= height:
+        band = image[offset:offset + band_height,0:width]
+        band_hist = cv2.calcHist([band],[0],None,[256],[0,256])
+        hist_list.append( ( sum( band_hist[:128] )[0], offset  ) )
+        offset += band_height
+
+    hist_ratio = 20
+        
+    # 最大のヒストグラムを取得し、
+    # その最大ヒストグラムのバンドよりも hist_ratio 分の 1 以下のバンドは
+    # 空白として除外する。
+    max_hist = max( hist_list, key = lambda x: x[0] )
+    hist_list.reverse()
+    for index, hist in enumerate( hist_list ):
+        if max_hist[0] / 20 < hist[0]:
+            if index < len( hist_list ):
+                return image[0:hist[1]+band_height * 2,0:width]
+            return image[0:hist[1]+band_height,0:width]
+    return image
+
+    
 # 切り出したメッセージボークスから、背景を消して文字を残す。
 def pickChar(image, parameter):
     image = cv2.resize(image, None, fx=2, fy=2, interpolation=cv2.INTER_CUBIC)
@@ -166,8 +196,11 @@ def pickChar(image, parameter):
     # 黒と、白どちらが多いかヒストグラムで判定し、
     # 黒の方が多い場合はネガポジ反転する。
     hist = cv2.calcHist([thresh],[0],None,[256],[0,256])
-    if sum( hist[:128] ) > sum(hist[128:] ):
-        return cv2.bitwise_not(thresh)
+    if sum( hist[:128] )[0] > sum(hist[128:] )[0]:
+        thresh = cv2.bitwise_not(thresh)
+
+    thresh = excludeBackground( thresh )
+        
     return thresh
 
 
@@ -249,6 +282,7 @@ def createPreparedOCRImage(image, parameter, debugFlag):
 
 if __name__ == '__main__':
     ocrImage = createPreparedOCRImage(Image.open('test.png'),
-                                      data.Parameter.create_default(), True)
+                                      data.Parameter.loadFile( sys.argv[1] ), True )
+                                      #data.Parameter.create_default(), True)
     # ocrImage = createPreparedOCRImage( Image.open('test2.png'),
     #                                    data.Parameter.create_default(), True )
