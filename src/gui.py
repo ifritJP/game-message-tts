@@ -64,8 +64,9 @@ def show(param, history):
         def run():
             print(txt)
             tts.speak(txt, param.volume, param.speed)
-        thread = threading.Thread(target=run)
-        thread.start()
+        run()
+        # thread = threading.Thread(target=run)
+        # thread.start()
 
     # ocr 開始
 
@@ -89,6 +90,7 @@ def show(param, history):
     ocrButton.bind("<1>", pushedOcrButton)
     ocrButton.pack(fill="both", side='left', expand=True)
 
+
     # 再生ボタン
     def pushedRepeatButton(event):
         lastTxt = textArea.get('1.0', 'end -1c')
@@ -100,6 +102,16 @@ def show(param, history):
     repeatButton.bind("<1>", pushedRepeatButton)
     repeatButton.pack(fill="both", side='left', expand=True)
 
+
+    # 停止ボタン
+    def pushedStopButton(event):
+        tts.stop()
+
+    repeatButton = tkinter.Button(frame, text=u'stop')
+    repeatButton.bind("<1>", pushedStopButton)
+    repeatButton.pack(fill="both", side='left', expand=True)
+
+    
     # 翻訳
     def pushedTranslateButton(event):
         lastTxt = textArea.get('1.0', 'end -1c')

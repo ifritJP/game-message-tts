@@ -18,7 +18,7 @@ def show(conf_dir):
         frame = tkinter.LabelFrame(parent, bd=2, relief="ridge", text=title)
         frame.pack(fill="both", expand=True)
         val = tkinter.StringVar()
-        combo = ttk.Combobox(frame, textvariable=val)
+        combo = ttk.Combobox(frame, textvariable=val, state='readonly')
         combo.config(values=valList)
         combo.set(valList[0])
         if onSelected:
