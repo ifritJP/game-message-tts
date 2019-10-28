@@ -4,20 +4,32 @@ import json
 import time
 import sys
 
-from dataclasses import field
-from marshmallow_dataclass import dataclass
-import marshmallow.validate
-from typing import List
+# from dataclasses import field
+# from marshmallow_dataclass import dataclass
+# import marshmallow.validate
+# from typing import List
+
+from dataclasses import dataclass, field
+from typing import List, Optional
+
+import marshmallow
+import marshmallow_dataclass
 
 
-def loadDataclass(path, dataclass):
-    return dataclass.Schema().load(json.load(open(path))).data
+def getSchema( dataclass ):
+    return marshmallow_dataclass.class_schema( dataclass )()
+
+def loadDataclass(path, schema):
+    txt = open(path).read()
+    return schema.loads( txt )
 
 
-def saveDataclass(path, dataclass, obj):
+def saveDataclass(path, schema, obj):
     fileObj = open(path, "w")
-    fileObj.write(dataclass.Schema().dumps(
-        obj, ensure_ascii=False, indent=4, sort_keys=True, separators=(',', ': ')).data)
+    # fileObj.write(dataclass.Schema().dumps(
+    #     obj, ensure_ascii=False, indent=4, sort_keys=True, separators=(',', ': ')).data)
+    fileObj.write(schema.dumps(
+        obj, ensure_ascii=False, indent=4, sort_keys=True, separators=(',', ': ')))
     fileObj.close()
 
 
@@ -65,13 +77,15 @@ class Parameter:
     @staticmethod
     def loadFile(path):
         try:
-            return loadDataclass(path, Parameter)
+            param = loadDataclass(path, getSchema(  Parameter ) )
+            return param
         except:
-            print(sys.exc_info()[0])
+            #print(sys.exc_info()[0])
+            print(sys.exc_info())
             return Parameter.create_default()
 
     def save(self, path):
-        saveDataclass(path, Parameter, self)
+        saveDataclass(path, getSchema( Parameter ), self)
 
 
 @dataclass
@@ -103,27 +117,28 @@ class History:
     @staticmethod
     def loadFile(path):
         try:
-            return loadDataclass(path, History)
+            return loadDataclass(path, getSchema(  History ) )
         except:
             print(sys.exc_info()[0])
             return History([])
 
     def save(self, path):
-        saveDataclass(path, History, self)
+        saveDataclass(path, getSchema( History ), self)
 
 
 if __name__ == '__main__':
     param = Parameter.create_default()
     print(param)
-    txt, _ = Parameter.Schema().dumps(param)
-    print(txt)
-    param2, _ = Parameter.Schema().loads(txt)
-    print(param2.volume)
+    schema = getSchema( Parameter )
+    txt = schema.dumps(param)
+    print("txt: %s" %(txt))
+    param2 = schema.loads(txt)
+    print( "volume: %s" %(param2.volume))
 
-    param3 = Parameter.loadFile("conf.json")
-    print(param3)
+    param3 = loadDataclass("conf.json", schema )
+    print( param3 )
 
-    param3.save("conf2.json")
+    open( "conf2.json", "w" ).write( schema.dumps( param3 ) )
 
     log = History([])
     for txt in ["abc", "def"]:
@@ -131,4 +146,4 @@ if __name__ == '__main__':
 
     print(log)
 
-    log.save("history.json")
+    saveDataclass( "history.json", getSchema( History ), log )
