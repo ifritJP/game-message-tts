@@ -16,12 +16,13 @@ import marshmallow
 import marshmallow_dataclass
 
 
-def getSchema( dataclass ):
-    return marshmallow_dataclass.class_schema( dataclass )()
+def getSchema(dataclass):
+    return marshmallow_dataclass.class_schema(dataclass)()
+
 
 def loadDataclass(path, schema):
     txt = open(path).read()
-    return schema.loads( txt )
+    return schema.loads(txt)
 
 
 def saveDataclass(path, schema, obj):
@@ -77,15 +78,15 @@ class Parameter:
     @staticmethod
     def loadFile(path):
         try:
-            param = loadDataclass(path, getSchema(  Parameter ) )
+            param = loadDataclass(path, getSchema(Parameter))
             return param
         except:
-            #print(sys.exc_info()[0])
+            # print(sys.exc_info()[0])
             print(sys.exc_info())
             return Parameter.create_default()
 
     def save(self, path):
-        saveDataclass(path, getSchema( Parameter ), self)
+        saveDataclass(path, getSchema(Parameter), self)
 
 
 @dataclass
@@ -117,28 +118,28 @@ class History:
     @staticmethod
     def loadFile(path):
         try:
-            return loadDataclass(path, getSchema(  History ) )
+            return loadDataclass(path, getSchema(History))
         except:
             print(sys.exc_info()[0])
             return History([])
 
     def save(self, path):
-        saveDataclass(path, getSchema( History ), self)
+        saveDataclass(path, getSchema(History), self)
 
 
 if __name__ == '__main__':
     param = Parameter.create_default()
     print(param)
-    schema = getSchema( Parameter )
+    schema = getSchema(Parameter)
     txt = schema.dumps(param)
-    print("txt: %s" %(txt))
+    print("txt: %s" % (txt))
     param2 = schema.loads(txt)
-    print( "volume: %s" %(param2.volume))
+    print("volume: %s" % (param2.volume))
 
-    param3 = loadDataclass("conf.json", schema )
-    print( param3 )
+    param3 = loadDataclass("conf.json", schema)
+    print(param3)
 
-    open( "conf2.json", "w" ).write( schema.dumps( param3 ) )
+    open("conf2.json", "w").write(schema.dumps(param3))
 
     log = History([])
     for txt in ["abc", "def"]:
@@ -146,4 +147,4 @@ if __name__ == '__main__':
 
     print(log)
 
-    saveDataclass( "history.json", getSchema( History ), log )
+    saveDataclass("history.json", getSchema(History), log)
