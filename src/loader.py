@@ -61,7 +61,7 @@ def show(conf_dir):
             title = urllib.parse.quote(param.game_title)
             conf_path = os.path.join(conf_dir, "%s.json" % (title))
 
-        param.save(conf_path)
+            param.save(conf_path)
 
     okButton = tkinter.Button(root, text=u'OK', width=50)
     okButton.bind("<1>", pushedButton)
